@@ -22,7 +22,7 @@ const Home = ({ userObj }) => {
         id: doc.id,
         ...doc.data(),
       }));
-      setNweets((prev) => [nweetObj, ...prev]);
+      setNweets(nweetObj);
     });
   };
   useEffect(() => {
@@ -32,7 +32,7 @@ const Home = ({ userObj }) => {
     event.preventDefault();
     try {
       const docRef = await addDoc(collection(dbService, "nweets"), {
-        text: text,
+        text,
         createdAt: Date.now(),
         creatorId: userObj.uid,
       });
@@ -48,6 +48,7 @@ const Home = ({ userObj }) => {
     } = event;
     setText(value);
   };
+  console.log(nweets);
   return (
     <div>
       <form onSubmit={onSubmit}>
