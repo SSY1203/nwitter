@@ -8,6 +8,7 @@ import {
   orderBy,
 } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
+import Nweet from "components/Nweet.js";
 
 const Home = ({ userObj }) => {
   const [text, setText] = useState("");
@@ -36,7 +37,6 @@ const Home = ({ userObj }) => {
         createdAt: Date.now(),
         creatorId: userObj.uid,
       });
-      console.log("Document written with ID: ", docRef);
     } catch (error) {
       console.error("Error adding document: ", error);
     }
@@ -48,7 +48,6 @@ const Home = ({ userObj }) => {
     } = event;
     setText(value);
   };
-  console.log(nweets);
   return (
     <div>
       <form onSubmit={onSubmit}>
@@ -63,9 +62,11 @@ const Home = ({ userObj }) => {
       </form>
       <div>
         {nweets.map((nweet) => (
-          <div key={nweet.creatorId}>
-            <h4>{nweet.text}</h4>
-          </div>
+          <Nweet
+            key={nweet.id}
+            nweetObj={nweet}
+            isOwner={nweet.creatorId === userObj.uid}
+          />
         ))}
       </div>
     </div>
