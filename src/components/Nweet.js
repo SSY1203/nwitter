@@ -33,7 +33,7 @@ const Nweet = ({ nweetObj, isOwner }) => {
     <div>
       {editing ? (
         <>
-          <form onSubmit={onSubmit}>
+          <form>
             <input
               onChange={onChange}
               value={newNweet}
