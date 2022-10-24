@@ -1,19 +1,20 @@
-import { dbService } from "fBase";
+import { dbService, storageService } from "fBase";
 import {
   addDoc,
   collection,
-  getDocs,
   query,
   onSnapshot,
   orderBy,
 } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import Nweet from "components/Nweet.js";
+import { v4 as uuidv4 } from "uuid";
+import { getDownloadURL, ref, uploadString } from "firebase/storage";
 
 const Home = ({ userObj }) => {
   const [text, setText] = useState("");
   const [nweets, setNweets] = useState([]);
-  const [imageFile, setImageFile] = useState();
+  const [imageFile, setImageFile] = useState("");
   const getNweets = async () => {
     const q = query(
       collection(dbService, "nweets"),
@@ -32,16 +33,27 @@ const Home = ({ userObj }) => {
   }, []);
   const onSubmit = async (event) => {
     event.preventDefault();
+    let imageUrl = "";
     try {
-      const docRef = await addDoc(collection(dbService, "nweets"), {
+      if (imageFile !== "") {
+        const imageRef = ref(storageService, `${userObj.uid}/${uuidv4()}`);
+        // * npm install uuid는 기본적으로 어떤 특별한 식벽자를 랜덤으로 생성해줌
+        const response = await uploadString(imageRef, imageFile, "data_url");
+        imageUrl = await getDownloadURL(response.ref);
+        // * getDownloadURL은 Promise를 리턴하는데, Promise는 "날 기다려줘"라는 의미로 await이 필요
+      }
+      const nweetObj = {
         text,
         createdAt: Date.now(),
         creatorId: userObj.uid,
-      });
+        imageUrl,
+      };
+      await addDoc(collection(dbService, "nweets"), nweetObj);
     } catch (error) {
       console.error("Error adding document: ", error);
     }
     setText("");
+    setImageFile("");
   };
   const onChange = (event) => {
     const {
@@ -64,7 +76,7 @@ const Home = ({ userObj }) => {
     };
     reader.readAsDataURL(theFile);
   };
-  const onClearImage = () => setImageFile(null);
+  const onClearImage = () => setImageFile("");
   return (
     <div>
       <form onSubmit={onSubmit}>
@@ -90,6 +102,7 @@ const Home = ({ userObj }) => {
             key={nweet.id}
             nweetObj={nweet}
             isOwner={nweet.creatorId === userObj.uid}
+            imageUrl={nweet.imageUrl}
           />
         ))}
       </div>
