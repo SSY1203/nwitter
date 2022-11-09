@@ -1,14 +1,14 @@
-import React from "react";
-import { HashRouter as Router, Route, Routes } from "react-router-dom";
-import Auth from "routes/Auth";
-import Home from "routes/Home";
-import Profile from "routes/Profile";
-import Navigation from "components/Navigation";
+import React from 'react';
+import { HashRouter as Router, Route, Routes } from 'react-router-dom';
+import Auth from 'routes/Auth';
+import Home from 'routes/Home';
+import Profile from 'routes/Profile';
+import Navigation from 'components/Navigation';
 
-const AppRouter = ({ userObj, isLogggedIn }) => {
+const AppRouter = ({ refreshUser, userObj, isLogggedIn }) => {
   return (
     <Router>
-      {isLogggedIn && <Navigation />}
+      {isLogggedIn && <Navigation userObj={userObj} />}
       <Routes>
         {isLogggedIn ? (
           <>
@@ -16,7 +16,7 @@ const AppRouter = ({ userObj, isLogggedIn }) => {
             <Route
               exact
               path="/profile"
-              element={<Profile userObj={userObj} />}
+              element={<Profile refreshUser={refreshUser} userObj={userObj} />}
             />
           </>
         ) : (

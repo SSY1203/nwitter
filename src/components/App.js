@@ -1,6 +1,7 @@
-import AppRouter from "components/Router";
-import React, { useEffect, useState } from "react";
-import { authService } from "fBase";
+import AppRouter from 'components/Router';
+import React, { useEffect, useState } from 'react';
+import { authService } from 'fBase';
+import { updateProfile } from '@firebase/auth';
 
 function App() {
   const [init, setInit] = useState(false);
@@ -13,7 +14,7 @@ function App() {
   const [userObj, setUserObj] = useState(null);
   // * 누가 로그인한건지 받아오기 위한 변수
   useEffect(() => {
-    authService.onAuthStateChanged((user) => {
+    authService.onAuthStateChanged(user => {
       // * onAuthStateChanged란?
       // * User의 로그인 상태의 변화를 관찰하는 메소드
       // * EventListener이고 User 상태에 변화가 있을 때, 변화를 알아차림
@@ -26,12 +27,24 @@ function App() {
       setInit(true);
     });
   }, []);
+  const refreshUser = () => {
+    if (userObj) {
+      setUserObj({
+        displayName: userObj.displayName,
+        uid: userObj.uid,
+        updateProfile: args =>
+          updateProfile(userObj, {
+            displayName: userObj.displayName,
+          }),
+      });
+    } else setUserObj(null);
+  };
   return (
     <>
       {init ? (
-        <AppRouter userObj={userObj} isLogggedIn={isLogggedIn} />
+        <AppRouter refreshUser={refreshUser} userObj={userObj} isLogggedIn={isLogggedIn} />
       ) : (
-        "Initailizing..."
+        'Initailizing...'
       )}
       <footer>&copy; {new Date().getFullYear()} Nwitter</footer>
     </>
